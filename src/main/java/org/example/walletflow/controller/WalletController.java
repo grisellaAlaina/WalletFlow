@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/wallets")
+@RequestMapping("/api/v1")
 public class WalletController {
     private final WalletService walletService;
 
@@ -15,12 +15,12 @@ public class WalletController {
         this.walletService = walletService;
     }
 
-    @PostMapping
+    @PostMapping("/wallet")
     public void updateBalance(@RequestBody WalletDTO request) {
         walletService.updateBalance(request.getWalletId(), request.getAmount(), request.getOperationType());
     }
 
-    @GetMapping("/{walletId}")
+    @GetMapping("wallets/{walletId}")
     public long getBalance(@PathVariable UUID walletId) {
         return walletService.getBalance(walletId);
     }
