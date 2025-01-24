@@ -3,9 +3,13 @@ package org.example.walletflow.service;
 import jakarta.transaction.Transactional;
 import org.example.walletflow.exception.InsufficientFundsException;
 import org.example.walletflow.exception.InvalidJsonException;
+import org.example.walletflow.exception.WalletException;
 import org.example.walletflow.exception.WalletNotFoundException;
 import org.example.walletflow.model.Wallet;
 import org.example.walletflow.repository.WalletRepository;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -20,6 +24,12 @@ public class WalletService {
         this.walletRepository = walletRepository;
     }
 
+    @Retryable(
+            retryFor = ObjectOptimisticLockingFailureException.class,
+            noRetryFor = WalletException.class,
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 100)
+    )
     public Wallet updateBalance(UUID walletId, long amount, String operationType) {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new WalletNotFoundException(walletId));
