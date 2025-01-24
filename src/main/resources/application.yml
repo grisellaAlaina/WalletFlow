@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://wallet-db:5432/walletdb
+    username: walletuser
+    password: walletpassword
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.xml
+    enabled: true
