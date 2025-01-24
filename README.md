@@ -47,7 +47,7 @@ curl http://localhost:8080/api/v1/wallets/550e8400-e29b-41d4-a716-446655440000
 ```
 ### Ответ
 ```json
-1500
+1000
 ```
 
 ## Обновление баланса
@@ -72,7 +72,7 @@ curl -X POST http://localhost:8080/api/v1/wallet \
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
-  "balance": 1000,
+  "balance": 1500,
   "version": 2
 }
 ```
