@@ -65,4 +65,41 @@ public class WalletControllerTest {
                 .andExpect(content().string("1000"));
     }
 
+    @Test
+    public void testUpdateBalance_InsufficientFunds() throws Exception {
+        // Arrange
+        WalletDTO request = new WalletDTO();
+        request.setWalletId(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"));
+        request.setAmount(2000L);
+        request.setOperationType("WITHDRAW");
+
+        when(walletService.updateBalance(any(UUID.class), any(Long.class), any(String.class)))
+                .thenThrow(new InsufficientFundsException(1000L, 2000L));
+
+        // Act & Assert
+        mockMvc.perform(post("/api/v1/wallet")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INSUFFICIENT_FUNDS"))
+                .andExpect(jsonPath("$.message").value("Insufficient funds. Balance: 1000, Required: 2000"));
+    }
+
+
+    @Test
+    public void testGetBalance_WalletNotFound() throws Exception {
+        // Arrange
+        UUID walletId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+        when(walletService.getBalance(walletId))
+                .thenThrow(new WalletNotFoundException(walletId));
+
+        // Act & Assert
+        mockMvc.perform(get("/api/v1/wallets/{walletId}", walletId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("WALLET_NOT_FOUND"))
+                .andExpect(jsonPath("$.message").value("Wallet not found: " + walletId));
+    }
+
+
+
 }
